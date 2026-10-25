@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RelanceDevis — Suivi des devis</title>
+  <style>
+    :root {
+      --green: #16834a;
+      --green-light: #e9f6ee;
+      --ink: #202923;
+      --muted: #69746d;
+      --line: #e4eae5;
+      --bg: #f6f8f6;
+      --white: #fff;
+      --orange: #f1a33b;
+      --red: #c7463d;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--ink); }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    header {
+      background: var(--white); border-bottom: 1px solid var(--line);
+      padding: 18px max(20px, calc((100% - 1050px) / 2));
+      display: flex; justify-content: space-between; align-items: center; gap: 12px;
+    }
+    .brand { font-size: 21px; font-weight: 800; color: var(--green); }
+    .brand span { color: var(--ink); }
+    .top-note { color: var(--muted); font-size: 13px; }
+    main { width: min(100% - 32px, 1000px); margin: 32px auto; }
+    .intro { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; }
+    h1 { margin: 0 0 6px; font-size: clamp(24px, 5vw, 32px); }
+    .subtitle { margin: 0; color: var(--muted); }
+    .primary {
+      border: 0; background: var(--green); color: white; padding: 12px 17px;
+      border-radius: 10px; font-weight: 700; white-space: nowrap;
+    }
+    .primary:hover { background: #116c3c; }
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 22px; }
+    .card,
