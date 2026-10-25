@@ -6,37 +6,288 @@
   <title>RelanceDevis — Suivi des devis</title>
   <style>
     :root {
-      --green: #16834a;
-      --green-light: #e9f6ee;
-      --ink: #202923;
-      --muted: #69746d;
-      --line: #e4eae5;
-      --bg: #f6f8f6;
-      --white: #fff;
-      --orange: #f1a33b;
-      --red: #c7463d;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --green: #16834a; --green-light: #e9f6ee; --ink: #202923;
+      --muted: #69746d; --line: #e4eae5; --bg: #f6f8f6;
+      --white: #fff; --orange: #f1a33b; --red: #c7463d;
     }
     * { box-sizing: border-box; }
-    body { margin: 0; background: var(--bg); color: var(--ink); }
+    body {
+      margin: 0; background: var(--bg); color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
     button, input, select, textarea { font: inherit; }
     button { cursor: pointer; }
     header {
       background: var(--white); border-bottom: 1px solid var(--line);
-      padding: 18px max(20px, calc((100% - 1050px) / 2));
-      display: flex; justify-content: space-between; align-items: center; gap: 12px;
+      padding: 16px 5%; display: flex; justify-content: space-between;
+      align-items: center; gap: 12px;
     }
-    .brand { font-size: 21px; font-weight: 800; color: var(--green); }
-    .brand span { color: var(--ink); }
-    .top-note { color: var(--muted); font-size: 13px; }
-    main { width: min(100% - 32px, 1000px); margin: 32px auto; }
-    .intro { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; }
-    h1 { margin: 0 0 6px; font-size: clamp(24px, 5vw, 32px); }
-    .subtitle { margin: 0; color: var(--muted); }
-    .primary {
-      border: 0; background: var(--green); color: white; padding: 12px 17px;
-      border-radius: 10px; font-weight: 700; white-space: nowrap;
+    .brand { font-size: 21px; font-weight: 800; }
+    .brand span { color: var(--green); }
+    .wrap { max-width: 1050px; margin: 28px auto; padding: 0 16px; }
+    .top, .toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+    h1 { font-size: 27px; margin: 0 0 5px; }
+    .sub, .muted { color: var(--muted); }
+    .btn {
+      border: 0; border-radius: 9px; padding: 11px 15px;
+      font-weight: 700; background: var(--green); color: white;
     }
-    .primary:hover { background: #116c3c; }
-    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 22px; }
-    .card,
+    .btn.secondary { background: var(--green-light); color: var(--green); }
+    .btn.danger { background: #fff0ee; color: var(--red); }
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 22px 0; }
+    .card, .panel { background: white; border: 1px solid var(--line); border-radius: 13px; padding: 17px; }
+    .stat-label { color: var(--muted); font-size: 14px; }
+    .stat-number { font-size: 25px; font-weight: 800; margin-top: 7px; }
+    .panel h2 { margin: 0 0 15px; font-size: 18px; }
+    .toolbar { margin-bottom: 14px; }
+    input, select, textarea {
+      border: 1px solid var(--line); border-radius: 8px; padding: 10px 11px;
+      background: white; color: var(--ink); width: 100%;
+    }
+    #search { flex: 1; min-width: 180px; width: auto; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 650px; }
+    th, td { padding: 12px 10px; text-align: left; border-bottom: 1px solid var(--line); }
+    th { color: var(--muted); font-size: 13px; }
+    .badge { display: inline-block; padding: 5px 9px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+    .À-envoyer, .En-attente { background: #fff4df; color: #94610b; }
+    .Accepté { background: var(--green-light); color: var(--green); }
+    .Refusé { background: #fff0ee; color: var(--red); }
+    .actions { display: flex; gap: 6px; }
+    .small { border: 1px solid var(--line); background: white; border-radius: 7px; padding: 6px 8px; }
+    .empty { text-align: center; color: var(--muted); padding: 28px 10px; }
+    .templates { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .template h3 { margin: 0 0 8px; font-size: 15px; }
+    .template p { color: var(--muted); font-size: 14px; line-height: 1.5; white-space: pre-wrap; }
+    .modal {
+      display: none; position: fixed; inset: 0; z-index: 5; background: #0007;
+      padding: 18px; align-items: center; justify-content: center;
+    }
+    .modal.open { display: flex; }
+    .dialog { background: white; border-radius: 14px; padding: 20px; width: min(100%, 500px); max-height: 92vh; overflow: auto; }
+    .dialog h2 { margin-top: 0; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .field { margin-bottom: 12px; }
+    .field label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 5px; }
+    .full { grid-column: 1 / -1; }
+    .dialog-buttons { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
+    footer { text-align: center; padding: 22px; color: var(--muted); font-size: 13px; }
+    @media (max-width: 650px) {
+      .stats { grid-template-columns: 1fr 1fr; }
+      .templates { grid-template-columns: 1fr; }
+      h1 { font-size: 23px; }
+      .top { align-items: flex-start; }
+      .form-grid { grid-template-columns: 1fr; }
+      .full { grid-column: auto; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">Relance<span>Devis</span></div>
+    <span class="muted">Votre suivi, simplement</span>
+  </header>
+
+  <main class="wrap">
+    <section class="top">
+      <div>
+        <h1>Tableau de bord</h1>
+        <div class="sub">Suivez vos devis et vos relances au même endroit.</div>
+      </div>
+      <button class="btn" id="addButton">＋ Ajouter un devis</button>
+    </section>
+
+    <section class="stats">
+      <div class="card"><div class="stat-label">Tous les devis</div><div class="stat-number" id="total">0</div></div>
+      <div class="card"><div class="stat-label">En attente</div><div class="stat-number" id="pending">0</div></div>
+      <div class="card"><div class="stat-label">À relancer</div><div class="stat-number" id="toFollow">0</div></div>
+      <div class="card"><div class="stat-label">Montant en attente</div><div class="stat-number" id="amount">0 €</div></div>
+    </section>
+
+    <section class="panel">
+      <h2>Mes devis</h2>
+      <div class="toolbar">
+        <input id="search" type="search" placeholder="Rechercher un client ou un devis…">
+        <select id="filter" aria-label="Filtrer les devis">
+          <option value="">Tous les statuts</option>
+          <option>À envoyer</option><option>En attente</option>
+          <option>Accepté</option><option>Refusé</option>
+        </select>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Client</th><th>Devis</th><th>Montant</th><th>Statut</th><th>Relance prévue</th><th>Actions</th></tr></thead>
+          <tbody id="quoteRows"></tbody>
+        </table>
+        <div class="empty" id="empty">Aucun devis pour le moment. Appuyez sur « Ajouter un devis » pour commencer.</div>
+      </div>
+    </section>
+
+    <section class="panel" style="margin-top:18px">
+      <h2>Modèles de relance</h2>
+      <div class="templates">
+        <article class="card template">
+          <h3>Première relance</h3>
+          <p>Bonjour,
+
+Je me permets de revenir vers vous concernant le devis envoyé. Avez-vous pu en prendre connaissance ?
+
+Je reste disponible pour répondre à vos questions.
+
+Bien cordialement</p>
+          <button class="btn secondary copy" data-template="0">Copier le modèle</button>
+        </article>
+        <article class="card template">
+          <h3>Relance de suivi</h3>
+          <p>Bonjour,
+
+Je reviens vers vous au sujet de mon devis. N’hésitez pas à me faire savoir si vous souhaitez des précisions ou des ajustements.
+
+Bien cordialement</p>
+          <button class="btn secondary copy" data-template="1">Copier le modèle</button>
+        </article>
+        <article class="card template">
+          <h3>Dernière relance</h3>
+          <p>Bonjour,
+
+Je vous contacte une dernière fois concernant le devis transmis. Si votre projet est toujours d’actualité, je serai ravi d’en discuter avec vous.
+
+Bien cordialement</p>
+          <button class="btn secondary copy" data-template="2">Copier le modèle</button>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer>Les informations sont enregistrées uniquement dans le navigateur de cet appareil.</footer>
+
+  <div class="modal" id="modal">
+    <form class="dialog" id="quoteForm">
+      <h2>Ajouter un devis</h2>
+      <div class="form-grid">
+        <div class="field"><label for="client">Nom du client *</label><input id="client" required maxlength="80" placeholder="Ex. Alex Martin"></div>
+        <div class="field"><label for="title">Objet du devis *</label><input id="title" required maxlength="100" placeholder="Ex. Rénovation cuisine"></div>
+        <div class="field"><label for="price">Montant (€) *</label><input id="price" required type="number" min="0" step="0.01" placeholder="0"></div>
+        <div class="field"><label for="status">Statut</label><select id="status"><option>En attente</option><option>À envoyer</option><option>Accepté</option><option>Refusé</option></select></div>
+        <div class="field full"><label for="reminder">Date de relance</label><input id="reminder" type="date"></div>
+      </div>
+      <div class="dialog-buttons">
+        <button class="btn secondary" type="button" id="cancelButton">Annuler</button>
+        <button class="btn" type="submit">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "relancedevis-quotes-v1";
+    let quotes = [];
+    try { quotes = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); }
+    catch { quotes = []; }
+
+    const $ = (id) => document.getElementById(id);
+    const money = (value) => new Intl.NumberFormat("fr-FR", {
+      style: "currency", currency: "EUR", maximumFractionDigits: 2
+    }).format(Number(value) || 0);
+
+    function save() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(quotes));
+      render();
+    }
+
+    function render() {
+      const query = $("search").value.trim().toLowerCase();
+      const statusFilter = $("filter").value;
+      const shown = quotes.filter(q =>
+        (!statusFilter || q.status === statusFilter) &&
+        (q.client.toLowerCase().includes(query) || q.title.toLowerCase().includes(query))
+      );
+
+      $("total").textContent = quotes.length;
+      $("pending").textContent = quotes.filter(q => q.status === "En attente").length;
+      const today = new Date().toISOString().slice(0, 10);
+      $("toFollow").textContent = quotes.filter(q =>
+        q.status === "En attente" && q.reminder && q.reminder <= today
+      ).length;
+      $("amount").textContent = money(quotes.filter(q => q.status === "En attente")
+        .reduce((sum, q) => sum + Number(q.price), 0));
+
+      $("quoteRows").innerHTML = shown.map(q => {
+        const badgeClass = q.status.replaceAll(" ", "-");
+        return `<tr>
+          <td><strong>${escapeHtml(q.client)}</strong></td>
+          <td>${escapeHtml(q.title)}</td>
+          <td>${money(q.price)}</td>
+          <td><span class="badge ${badgeClass}">${escapeHtml(q.status)}</span></td>
+          <td>${q.reminder ? new Date(q.reminder + "T12:00:00").toLocaleDateString("fr-FR") : "—"}</td>
+          <td><div class="actions">
+            <button class="small" data-action="status" data-id="${q.id}" title="Changer le statut">↻</button>
+            <button class="small" data-action="delete" data-id="${q.id}" title="Supprimer">✕</button>
+          </div></td>
+        </tr>`;
+      }).join("");
+
+      $("empty").style.display = shown.length ? "none" : "block";
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, char => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+      })[char]);
+    }
+
+    $("addButton").addEventListener("click", () => $("modal").classList.add("open"));
+    $("cancelButton").addEventListener("click", () => $("modal").classList.remove("open"));
+    $("modal").addEventListener("click", event => {
+      if (event.target === $("modal")) $("modal").classList.remove("open");
+    });
+    $("quoteForm").addEventListener("submit", event => {
+      event.preventDefault();
+      quotes.unshift({
+        id: (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())),
+        client: $("client").value.trim(),
+        title: $("title").value.trim(),
+        price: Number($("price").value),
+        status: $("status").value,
+        reminder: $("reminder").value
+      });
+      save();
+      event.target.reset();
+      $("modal").classList.remove("open");
+    });
+    $("search").addEventListener("input", render);
+    $("filter").addEventListener("change", render);
+    $("quoteRows").addEventListener("click", event => {
+      const button = event.target.closest("button[data-action]");
+      if (!button) return;
+      const index = quotes.findIndex(q => q.id === button.dataset.id);
+      if (index < 0) return;
+      if (button.dataset.action === "delete") {
+        if (confirm("Supprimer ce devis ?")) quotes.splice(index, 1);
+      } else {
+        const order = ["En attente", "Accepté", "Refusé", "À envoyer"];
+        quotes[index].status = order[(order.indexOf(quotes[index].status) + 1) % order.length];
+      }
+      save();
+    });
+
+    const templates = [
+      "Bonjour,\\n\\nJe me permets de revenir vers vous concernant le devis envoyé. Avez-vous pu en prendre connaissance ?\\n\\nJe reste disponible pour répondre à vos questions.\\n\\nBien cordialement",
+      "Bonjour,\\n\\nJe reviens vers vous au sujet de mon devis. N’hésitez pas à me faire savoir si vous souhaitez des précisions ou des ajustements.\\n\\nBien cordialement",
+      "Bonjour,\\n\\nJe vous contacte une dernière fois concernant le devis transmis. Si votre projet est toujours d’actualité, je serai ravi d’en discuter avec vous.\\n\\nBien cordialement"
+    ];
+    document.querySelectorAll(".copy").forEach(button => {
+      button.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(templates[Number(button.dataset.template)]);
+          button.textContent = "Copié !";
+          setTimeout(() => button.textContent = "Copier le modèle", 1400);
+        } catch {
+          alert("La copie automatique n’est pas disponible dans ce navigateur.");
+        }
+      });
+    });
+
+    render();
+  </script>
+</body>
+</html>
